@@ -80,7 +80,7 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public void updateQuantity(Integer productId, Integer quantity) {
-        String sql = "update Product set Quantity = :quantity where Id = :productId";
+        String sql = "call updateQuantity(:productId, :quantity)";
 
         HashMap<String, Object> map = new HashMap<>();
         map.put("productId", productId);
