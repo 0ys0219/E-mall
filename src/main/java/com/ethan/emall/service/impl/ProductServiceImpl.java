@@ -1,6 +1,8 @@
 package com.ethan.emall.service.impl;
 
 import com.ethan.emall.dao.ProductDao;
+import com.ethan.emall.dto.ProductQueryParams;
+import com.ethan.emall.dto.ProductRequest;
 import com.ethan.emall.model.Product;
 import com.ethan.emall.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        return productDao.getAllProducts();
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
+        return productDao.getProducts(productQueryParams);
+    }
+
+
+    public Integer createProduct(ProductRequest productRequest){
+        return productDao.createProduct(productRequest);
     }
 }

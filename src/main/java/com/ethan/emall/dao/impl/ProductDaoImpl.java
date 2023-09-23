@@ -1,16 +1,20 @@
 package com.ethan.emall.dao.impl;
 
 import com.ethan.emall.dao.ProductDao;
+import com.ethan.emall.dto.ProductQueryParams;
+import com.ethan.emall.dto.ProductRequest;
 import com.ethan.emall.model.Product;
 import com.ethan.emall.rowmapper.ProductRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Component
 public class ProductDaoImpl implements ProductDao {
@@ -36,10 +40,15 @@ public class ProductDaoImpl implements ProductDao {
     }
 
 
-    public List<Product> getAllProducts() {
-        String sql = "select id, name, price, quantity from Product;";
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
+        String sql = "select id, name, price, quantity from Product where 1=1";
 
         HashMap<String, Object> map = new HashMap<>();
+
+        if (productQueryParams.getQuantity() != null) {
+            sql = sql + " and quantity > :quantity ";
+            map.put("quantity",productQueryParams.getQuantity());
+        }
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 
@@ -48,5 +57,23 @@ public class ProductDaoImpl implements ProductDao {
         } else {
             return null;
         }
+    }
+
+
+    public Integer createProduct(ProductRequest productRequest) {
+        String sql = "insert into Product(name, price, quantity)" +
+                "values" +
+                "(:name,:price,:quantity)";
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("name",productRequest.getName());
+        map.put("price",productRequest.getPrice());
+        map.put("quantity",productRequest.getQuantity());
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        namedParameterJdbcTemplate.update(sql,new MapSqlParameterSource(map),keyHolder);
+
+        return keyHolder.getKey().intValue();
     }
 }

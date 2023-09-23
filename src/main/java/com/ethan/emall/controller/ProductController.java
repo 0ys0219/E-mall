@@ -1,14 +1,15 @@
 package com.ethan.emall.controller;
 
+import com.ethan.emall.dto.ProductQueryParams;
+import com.ethan.emall.dto.ProductRequest;
 import com.ethan.emall.model.Product;
 import com.ethan.emall.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -29,13 +30,21 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getAllProducts(){
-        List<Product> productList = productService.getAllProducts();
+    public ResponseEntity<List<Product>> getProducts(@RequestParam(required = false) Integer quantity){
+        ProductQueryParams productQueryParams = new ProductQueryParams();
+        productQueryParams.setQuantity(quantity);
 
-        if (productList.size() > 0) {
+        List<Product> productList = productService.getProducts(productQueryParams);
+
             return ResponseEntity.status(HttpStatus.OK).body(productList);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    }
+
+    @PostMapping("/products")
+    public ResponseEntity<Product> createProduct(@RequestBody @Valid ProductRequest productRequest) {
+        Integer productId = productService.createProduct(productRequest);
+
+        Product product = productService.getProductById(productId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 }
