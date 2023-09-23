@@ -13,4 +13,6 @@ public interface ProductDao {
     List<Product> getProducts(ProductQueryParams productQueryParams);
 
     Integer createProduct(ProductRequest productRequest);
+
+    void updateQuantity(Integer productId, Integer quantity);
 }

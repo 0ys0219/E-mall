@@ -76,4 +76,15 @@ public class ProductDaoImpl implements ProductDao {
 
         return keyHolder.getKey().intValue();
     }
+
+    @Override
+    public void updateQuantity(Integer productId, Integer quantity) {
+        String sql = "update Product set Quantity = :quantity where Id = :productId";
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("productId",productId);
+        map.put("quantity",quantity);
+
+        namedParameterJdbcTemplate.update(sql,map);
+    }
 }
