@@ -1,6 +1,7 @@
 package com.ethan.emall.service.impl;
 
 import com.ethan.emall.dao.MemberDao;
+import com.ethan.emall.dto.MemberLoginRequest;
 import com.ethan.emall.dto.MemberRegisterRequest;
 import com.ethan.emall.model.Member;
 import com.ethan.emall.service.MemberService;
@@ -36,4 +37,23 @@ public class MemberServiceImpl implements MemberService {
     public Member getMemberById(Integer memberId){
         return memberDao.getMemberById(memberId);
     }
+
+    @Override
+    public Member login(MemberLoginRequest memberLoginRequest) {
+        Member member = memberDao.getMemberByAccount(memberLoginRequest.getAccount());
+
+        if (member == null) {
+            log.warn("該帳號 {} 尚未註冊",memberLoginRequest.getAccount());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if (member.getPassword().equals(memberLoginRequest.getPassword())) {
+            return member;
+        } else {
+            log.warn("該帳號 {} 的密碼不正確",memberLoginRequest.getAccount());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
 }

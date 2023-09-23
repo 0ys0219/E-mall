@@ -1,5 +1,6 @@
 package com.ethan.emall.controller;
 
+import com.ethan.emall.dto.MemberLoginRequest;
 import com.ethan.emall.dto.MemberRegisterRequest;
 import com.ethan.emall.model.Member;
 import com.ethan.emall.service.MemberService;
@@ -27,6 +28,11 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(member);
     }
 
+    @PostMapping("/members/login")
+    public ResponseEntity<Member> login(@RequestBody @Valid MemberLoginRequest memberLoginRequest) {
+        Member member = memberService.login(memberLoginRequest);
 
+        return ResponseEntity.status(HttpStatus.OK).body(member);
+    }
 
 }
