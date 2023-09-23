@@ -6,8 +6,11 @@ import com.ethan.emall.dto.ProductRequest;
 import com.ethan.emall.model.Product;
 import com.ethan.emall.rowmapper.ProductRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
@@ -20,12 +23,15 @@ import java.util.Map;
 public class ProductDaoImpl implements ProductDao {
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
     public Product getProductById(Integer productId) {
 
-        String sql = "select id, name, price, quantity from Product where id = :productId;";
+        String sql = "call getProductById(:productId) ";
 
         Map<String, Object> map = new HashMap<>();
         map.put("productId", productId);
@@ -41,14 +47,10 @@ public class ProductDaoImpl implements ProductDao {
 
 
     public List<Product> getProducts(ProductQueryParams productQueryParams) {
-        String sql = "select id, name, price, quantity from Product where 1=1";
+        String sql = "call getProducts() ";
 
         HashMap<String, Object> map = new HashMap<>();
 
-        if (productQueryParams.getQuantity() != null) {
-            sql = sql + " and quantity > :quantity ";
-            map.put("quantity",productQueryParams.getQuantity());
-        }
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 
@@ -61,20 +63,19 @@ public class ProductDaoImpl implements ProductDao {
 
 
     public Integer createProduct(ProductRequest productRequest) {
-        String sql = "insert into Product(name, price, quantity)" +
-                "values" +
-                "(:name,:price,:quantity)";
+        SimpleJdbcCall simpleJdbcCall = new SimpleJdbcCall(jdbcTemplate);
 
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("name",productRequest.getName());
-        map.put("price",productRequest.getPrice());
-        map.put("quantity",productRequest.getQuantity());
+        HashMap<String, Object> mapIn = new HashMap<>();
+        mapIn.put("in_name", productRequest.getName());
+        mapIn.put("in_price", productRequest.getPrice());
+        mapIn.put("in_quantity", productRequest.getQuantity());
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+        SqlParameterSource in = new MapSqlParameterSource(mapIn);
+        Map<String, Object> mapOut = simpleJdbcCall.withProcedureName("createProduct").execute(in);
 
-        namedParameterJdbcTemplate.update(sql,new MapSqlParameterSource(map),keyHolder);
+        int productId = Integer.parseInt(String.valueOf(mapOut.get("out_productId")));
 
-        return keyHolder.getKey().intValue();
+        return productId;
     }
 
     @Override
@@ -82,9 +83,9 @@ public class ProductDaoImpl implements ProductDao {
         String sql = "update Product set Quantity = :quantity where Id = :productId";
 
         HashMap<String, Object> map = new HashMap<>();
-        map.put("productId",productId);
-        map.put("quantity",quantity);
+        map.put("productId", productId);
+        map.put("quantity", quantity);
 
-        namedParameterJdbcTemplate.update(sql,map);
+        namedParameterJdbcTemplate.update(sql, map);
     }
 }

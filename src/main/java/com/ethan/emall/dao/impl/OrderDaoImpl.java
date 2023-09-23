@@ -23,7 +23,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public Integer createOrder(Integer memberId, Integer totalAmount) {
-       String sql = "insert into `Order`(memberId, price) values (:memberId, :price)";
+       String sql = "call createOrder(:memberId, :price)";
 
         HashMap<String, Object> map = new HashMap<>();
         map.put("memberId",memberId);
@@ -41,8 +41,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public void createOrderItems(Integer orderId, List<OrderDetail> orderDetailList) {
-        String sql = "insert into  OrderDetail(orderId, productId, quantity, standPrice, itemPrice)" +
-                "values (:orderId, :productId, :quantity, :standPrice, :itemPrice);";
+        String sql = "call createOrderItems(:orderId, :productId, :quantity, :standPrice, :itemPrice)";
 
         MapSqlParameterSource[] parameterSources = new MapSqlParameterSource[orderDetailList.size()];
 
@@ -63,7 +62,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public Order getOrderById(Integer orderId) {
-        String sql = "select OrderId,MemberId,Price,PayStatus from `Order` where OrderId = :orderId";
+        String sql = "call getOrderById(:orderId)";
 
         HashMap<String, Object> map = new HashMap<>();
         map.put("orderId",orderId);
@@ -79,11 +78,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public List<OrderDetail> getOrderDetailsByOrderId(Integer orderId) {
-        String sql = "select od.orderitemsn, od.orderid, od.productid, p.Name, od.quantity, od.standprice, od.itemprice " +
-                "from OrderDetail od " +
-                "left join Product p " +
-                "on od.ProductId = p.Id " +
-                "where OrderId = :orderId ";
+        String sql = "call getOrderDetailsByOrderId(:orderId)";
 
         HashMap<String, Object> map = new HashMap<>();
         map.put("orderId",orderId);
@@ -95,8 +90,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public List<Order> getOrdersByMember(Integer memberId) {
-        String sql = "select orderId, memberId, price, payStatus " +
-                "from `Order` where MemberId = :memberId order by OrderId desc";
+        String sql ="call getOrdersByMember(:memberId)";
 
         HashMap<String, Object> map = new HashMap<>();
         map.put("memberId",memberId);
