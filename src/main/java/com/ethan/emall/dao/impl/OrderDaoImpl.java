@@ -92,4 +92,17 @@ public class OrderDaoImpl implements OrderDao {
 
         return orderDetailList;
     }
+
+    @Override
+    public List<Order> getOrdersByMember(Integer memberId) {
+        String sql = "select orderId, memberId, price, payStatus " +
+                "from `Order` where MemberId = :memberId order by OrderId desc";
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("memberId",memberId);
+
+        List<Order> orderList = namedParameterJdbcTemplate.query(sql, map, new OrderRowMapper());
+
+        return orderList;
+    }
 }

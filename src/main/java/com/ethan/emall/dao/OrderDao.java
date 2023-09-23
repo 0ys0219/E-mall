@@ -11,6 +11,8 @@ public interface OrderDao {
 
     Order getOrderById(Integer orderId);
 
+    List<Order> getOrdersByMember(Integer memberId);
+
     List<OrderDetail> getOrderDetailsByOrderId(Integer orderId);
 
     void createOrderItems(Integer orderId, List<OrderDetail> orderDetailList);

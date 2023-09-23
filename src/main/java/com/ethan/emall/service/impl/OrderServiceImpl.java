@@ -96,4 +96,16 @@ public class OrderServiceImpl implements OrderService {
 
         return order;
     }
+
+    @Override
+    public List<Order> getOrdersByMember(Integer memberId) {
+        List<Order> orderList = orderDao.getOrdersByMember(memberId);
+
+        for (Order order : orderList) {
+            List<OrderDetail> orderDetailList = orderDao.getOrderDetailsByOrderId(order.getOrderId());
+
+            order.setOrderDetailList(orderDetailList);
+        }
+        return orderList;
+    }
 }
