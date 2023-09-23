@@ -9,6 +9,8 @@ public class OrderDetail {
     private Integer standPrice;
     private Integer itemPrice;
 
+    private String productName;
+
     public Integer getOrderItemSN() {
         return orderItemSN;
     }
@@ -55,5 +57,13 @@ public class OrderDetail {
 
     public void setItemPrice(Integer itemPrice) {
         this.itemPrice = itemPrice;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

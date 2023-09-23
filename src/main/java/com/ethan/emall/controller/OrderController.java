@@ -1,6 +1,7 @@
 package com.ethan.emall.controller;
 
 import com.ethan.emall.dto.CreateOrderRequest;
+import com.ethan.emall.model.Order;
 import com.ethan.emall.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,8 @@ public class OrderController {
                                          @RequestBody @Valid CreateOrderRequest createOrderRequest) {
             Integer orderId = orderService.createOrder(memberId, createOrderRequest);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(orderId);
+            Order order = orderService.getOrderById(orderId);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 }

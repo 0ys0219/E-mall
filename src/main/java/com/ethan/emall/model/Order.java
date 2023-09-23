@@ -1,10 +1,14 @@
 package com.ethan.emall.model;
 
+import java.util.List;
+
 public class Order {
     private Integer orderId;
     private Integer memberId;
     private Integer price;
     private Boolean payStatus;
+
+    private List<OrderDetail> orderDetailList;
 
     public Integer getOrderId() {
         return orderId;
@@ -36,5 +40,13 @@ public class Order {
 
     public void setPayStatus(Boolean payStatus) {
         this.payStatus = payStatus;
+    }
+
+    public List<OrderDetail> getOrderDetailList() {
+        return orderDetailList;
+    }
+
+    public void setOrderDetailList(List<OrderDetail> orderDetailList) {
+        this.orderDetailList = orderDetailList;
     }
 }

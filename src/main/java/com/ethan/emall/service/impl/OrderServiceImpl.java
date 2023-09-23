@@ -4,6 +4,7 @@ import com.ethan.emall.dao.OrderDao;
 import com.ethan.emall.dao.ProductDao;
 import com.ethan.emall.dto.BuyItem;
 import com.ethan.emall.dto.CreateOrderRequest;
+import com.ethan.emall.model.Order;
 import com.ethan.emall.model.OrderDetail;
 import com.ethan.emall.model.Product;
 import com.ethan.emall.service.OrderService;
@@ -22,6 +23,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ProductDao productDao;
+
+
+
 
     @Transactional
     @Override
@@ -50,5 +54,16 @@ public class OrderServiceImpl implements OrderService {
         orderDao.createOrderItems(orderId, orderDetailList);
 
         return orderId;
+    }
+
+    @Override
+    public Order getOrderById(Integer orderId) {
+        Order order = orderDao.getOrderById(orderId);
+
+        List<OrderDetail> orderDetailList = orderDao.getOrderDetailsByOrderId(orderId);
+
+        order.setOrderDetailList(orderDetailList);
+
+        return order;
     }
 }

@@ -1,7 +1,10 @@
 package com.ethan.emall.dao.impl;
 
 import com.ethan.emall.dao.OrderDao;
+import com.ethan.emall.model.Order;
 import com.ethan.emall.model.OrderDetail;
+import com.ethan.emall.rowmapper.OrderDetailRowMapper;
+import com.ethan.emall.rowmapper.OrderRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -35,6 +38,7 @@ public class OrderDaoImpl implements OrderDao {
         return orderId;
     }
 
+
     @Override
     public void createOrderItems(Integer orderId, List<OrderDetail> orderDetailList) {
         String sql = "insert into  OrderDetail(orderId, productId, quantity, standPrice, itemPrice)" +
@@ -57,5 +61,35 @@ public class OrderDaoImpl implements OrderDao {
         namedParameterJdbcTemplate.batchUpdate(sql,parameterSources);
     }
 
+    @Override
+    public Order getOrderById(Integer orderId) {
+        String sql = "select OrderId,MemberId,Price,PayStatus from `Order` where OrderId = :orderId";
 
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("orderId",orderId);
+
+        List<Order> orderList = namedParameterJdbcTemplate.query(sql,map,new OrderRowMapper());
+
+        if (orderList.size() > 0) {
+            return orderList.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public List<OrderDetail> getOrderDetailsByOrderId(Integer orderId) {
+        String sql = "select od.orderitemsn, od.orderid, od.productid, p.Name, od.quantity, od.standprice, od.itemprice " +
+                "from OrderDetail od " +
+                "left join Product p " +
+                "on od.ProductId = p.Id " +
+                "where OrderId = :orderId ";
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("orderId",orderId);
+
+        List<OrderDetail> orderDetailList = namedParameterJdbcTemplate.query(sql,map,new OrderDetailRowMapper());
+
+        return orderDetailList;
+    }
 }
