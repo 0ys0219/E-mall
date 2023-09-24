@@ -13,6 +13,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@CrossOrigin(value = "http://localhost:5173")
 public class ProductController {
 
     @Autowired

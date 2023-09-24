@@ -37,9 +37,9 @@ create table IF NOT EXISTS OrderDetail
 #insert init data
 #member
 insert into Member(account, password)
-values ('458', '123'),
-       ('55688', '123'),
-       ('1713', '456');
+values ('458', '202cb962ac59075b964b07152d234b70'),
+       ('55688', '202cb962ac59075b964b07152d234b70'),
+       ('1713', '202cb962ac59075b964b07152d234b70');
 
 #product
 insert into Product(name, price, quantity)
@@ -50,9 +50,9 @@ values ('osii 舒壓按摩椅', 98000, 5),
 
 #order
 insert into `Order`(memberid, price, PayStatus)
-    values ('458', 98000, 1),
-           ('55688', 9700, 0),
-           ('1713', 2400, 1);
+    values ('1', 98000, 1),
+           ('2', 9700, 0),
+           ('3', 2400, 1);
 
 #orderDetail
 insert into OrderDetail(orderid, productid, quantity, standprice, itemprice)
