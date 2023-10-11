@@ -1,12 +1,29 @@
 package com.ethan.emall.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+
+@Entity
+@Table(name = "member")
 public class Member {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "Id")
     private Integer id;
+	
+	@Column(name = "Account")
     private String account;
 
     @JsonIgnore
+    @Column(name = "Password")
     private String password;
 
 

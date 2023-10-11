@@ -3,6 +3,7 @@ package com.ethan.emall.dao.impl;
 import com.ethan.emall.dao.MemberDao;
 import com.ethan.emall.dto.MemberRegisterRequest;
 import com.ethan.emall.model.Member;
+import com.ethan.emall.repository.MemberRepository;
 import com.ethan.emall.rowmapper.MemberRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -16,60 +17,39 @@ import java.util.List;
 
 @Component
 public class MemberDaoImpl implements MemberDao {
-
+    
     @Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private MemberRepository memberRepository;
 
     @Override
     public Integer createMember(MemberRegisterRequest memberRegisterRequest) {
 
-        String sql = "insert into Member(account, password)" +
-                "VALUES(:account, :password)";
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("account",memberRegisterRequest.getAccount());
-        map.put("password",memberRegisterRequest.getPassword());
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        namedParameterJdbcTemplate.update(sql,new MapSqlParameterSource(map),keyHolder);
-
-        int memberId = keyHolder.getKey().intValue();
-
+    	Member member = new Member();
+    	member.setAccount(memberRegisterRequest.getAccount());
+    	member.setPassword(memberRegisterRequest.getPassword());
+    	memberRepository.save(member);
+    	Integer memberId = member.getId();
+    	System.out.println(member.getId());
         return memberId;
     }
 
 
     public Member getMemberByAccount(String account) {
-        String sql = "select id,account,password from Member where account = :account";
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("account",account);
-
-        List<Member> memberList = namedParameterJdbcTemplate.query(sql,map,new MemberRowMapper());
-
-        if (memberList.size() > 0) {
-            return memberList.get(0);
-        } else {
-            return null;
-        }
+    	List<Member> memberList = memberRepository.findByAccount(account);
+    	
+    	if (memberList.size() > 0) {
+    		return memberList.get(0);
+    	} else {
+    		return null;
+    	}
+    	   	
     }
 
     @Override
     public Member getMemberById(Integer memberId) {
 
-        String sql = "select id,account,password from Member where id = :memberId";
-
-        HashMap<String, Object> map = new HashMap<>();
-
-        map.put("memberId",memberId);
-
-        List<Member> memberList = namedParameterJdbcTemplate.query(sql, map, new MemberRowMapper());
-
-        if (memberList.size() > 0) {
-            return memberList.get(0);
-        } else {
-            return null;
-        }
+    	Member member = memberRepository.findById(memberId).orElse(null);
+    	
+    	return member;
     }
 }
