@@ -4,7 +4,11 @@ import com.ethan.emall.dao.ProductDao;
 import com.ethan.emall.dto.ProductQueryParams;
 import com.ethan.emall.dto.ProductRequest;
 import com.ethan.emall.model.Product;
+import com.ethan.emall.repository.ProductRepository;
 import com.ethan.emall.rowmapper.ProductRowMapper;
+
+import net.bytebuddy.asm.Advice.OffsetMapping.Sort;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -19,72 +23,42 @@ import java.util.Map;
 @Component
 public class ProductDaoImpl implements ProductDao {
 
-    @Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	@Autowired
+	private ProductRepository productRepository;
 
-    @Override
-    public Product getProductById(Integer productId) {
+	@Override
+	public Product getProductById(Integer productId) {
 
-        String sql = "select id, name, price, quantity from Product where id = :productId;";
+		Product product = productRepository.findById(productId).orElse(null);
+		return product;
+	}
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("productId", productId);
+	public List<Product> getProducts(ProductQueryParams productQueryParams) {
 
-        List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
+		List<Product> productList = (List<Product>) productRepository.findAll();
+		return productList;
 
-        if (productList.size() > 0) {
-            return productList.get(0);
-        } else {
-            return null;
-        }
-    }
+	}
 
+	public Integer createProduct(ProductRequest productRequest) {
 
-    public List<Product> getProducts(ProductQueryParams productQueryParams) {
-        String sql = "select id, name, price, quantity from Product where 1=1";
+		Product product = new Product();
+		product.setName(productRequest.getName());
+		product.setPrice(productRequest.getPrice());
+		product.setQuantity(productRequest.getQuantity());
+		productRepository.save(product);
+		return product.getId();
 
-        HashMap<String, Object> map = new HashMap<>();
+	}
 
-        if (productQueryParams.getQuantity() != null) {
-            sql = sql + " and quantity > :quantity ";
-            map.put("quantity",productQueryParams.getQuantity());
-        }
+	@Override
+	public void updateQuantity(Integer productId, Integer quantity) {
 
-        List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
+		Product product = productRepository.findById(productId).orElse(null);
 
-        if (productList.size() > 0) {
-            return productList;
-        } else {
-            return null;
-        }
-    }
+		product.setQuantity(quantity);
 
+		productRepository.save(product);
 
-    public Integer createProduct(ProductRequest productRequest) {
-        String sql = "insert into Product(name, price, quantity)" +
-                "values" +
-                "(:name,:price,:quantity)";
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("name",productRequest.getName());
-        map.put("price",productRequest.getPrice());
-        map.put("quantity",productRequest.getQuantity());
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        namedParameterJdbcTemplate.update(sql,new MapSqlParameterSource(map),keyHolder);
-
-        return keyHolder.getKey().intValue();
-    }
-
-    @Override
-    public void updateQuantity(Integer productId, Integer quantity) {
-        String sql = "update Product set Quantity = :quantity where Id = :productId";
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("productId",productId);
-        map.put("quantity",quantity);
-
-        namedParameterJdbcTemplate.update(sql,map);
-    }
+	}
 }
