@@ -1,15 +1,41 @@
 package com.ethan.emall.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name = "orderdetail")
 public class OrderDetail {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "orderitemsn")
     private Integer orderItemSN;
+	
+	@Column(name = "orderid")
     private Integer orderId;
+	
+	@Column(name = "productid")
     private Integer productId;
+	
+	@Column
     private Integer quantity;
+	
+	@Column(name = "standprice")
     private Integer standPrice;
+	
+	@Column(name = "itemprice")
     private Integer itemPrice;
 
-    private String productName;
+	@Transient
+	private String productName;
 
     public Integer getOrderItemSN() {
         return orderItemSN;
@@ -59,11 +85,14 @@ public class OrderDetail {
         this.itemPrice = itemPrice;
     }
 
-    public String getProductName() {
-        return productName;
-    }
+	public String getProductName() {
+		return productName;
+	}
 
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+
+
+
 }

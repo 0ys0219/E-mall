@@ -1,108 +1,75 @@
 package com.ethan.emall.dao.impl;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.ethan.emall.dao.OrderDao;
 import com.ethan.emall.model.Order;
 import com.ethan.emall.model.OrderDetail;
-import com.ethan.emall.rowmapper.OrderDetailRowMapper;
-import com.ethan.emall.rowmapper.OrderRowMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.List;
+import com.ethan.emall.model.Product;
+import com.ethan.emall.repository.OrderDetailRepository;
+import com.ethan.emall.repository.OrderRepository;
+import com.ethan.emall.repository.ProductRepository;
 
 @Component
 public class OrderDaoImpl implements OrderDao {
 
-    @Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	@Autowired
+	private OrderRepository orderRepository;
 
-    @Override
-    public Integer createOrder(Integer memberId, Integer totalAmount) {
-       String sql = "insert into `Order`(memberId, price) values (:memberId, :price)";
+	@Autowired
+	private OrderDetailRepository orderDetailRepository;
 
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("memberId",memberId);
-        map.put("price",totalAmount);
+	@Autowired
+	private ProductRepository productRepository;
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+	@Override
+	public Integer createOrder(Integer memberId, Integer totalAmount) {
 
-        namedParameterJdbcTemplate.update(sql,new MapSqlParameterSource(map),keyHolder);
+		Order order = new Order();
+		order.setMemberId(memberId);
+		order.setPayStatus(false);
+		order.setPrice(totalAmount);
+		orderRepository.save(order);
 
-        int orderId = keyHolder.getKey().intValue();
+		return order.getOrderId();
+	}
 
-        return orderId;
-    }
+	@Override
+	public void createOrderItems(Integer orderId, List<OrderDetail> orderDetailList) {
 
+		for (OrderDetail orderDetail : orderDetailList) {
+			orderDetail.setOrderId(orderId);
+		}
+		orderDetailRepository.saveAll(orderDetailList);
 
-    @Override
-    public void createOrderItems(Integer orderId, List<OrderDetail> orderDetailList) {
-        String sql = "insert into  OrderDetail(orderId, productId, quantity, standPrice, itemPrice)" +
-                "values (:orderId, :productId, :quantity, :standPrice, :itemPrice);";
+	}
 
-        MapSqlParameterSource[] parameterSources = new MapSqlParameterSource[orderDetailList.size()];
+	@Override
+	public Order getOrderById(Integer orderId) {
 
-        for (int i = 0; i < orderDetailList.size(); i++) {
-            OrderDetail orderDetail = orderDetailList.get(i);
+		Order order = orderRepository.findById(orderId).orElse(null);
+		return order;
+	}
 
-            parameterSources[i] = new MapSqlParameterSource();
-            parameterSources[i].addValue("orderId",orderId);
-            parameterSources[i].addValue("productId",orderDetail.getProductId());
-            parameterSources[i].addValue("quantity",orderDetail.getQuantity());
-            parameterSources[i].addValue("standPrice",orderDetail.getStandPrice());
-            parameterSources[i].addValue("itemPrice",orderDetail.getItemPrice());
+	@Override
+	public List<OrderDetail> getOrderDetailsByOrderId(Integer orderId) {
 
-        }
+		List<OrderDetail> orderDetails = orderDetailRepository.getOrderDetailsByOrderId(orderId);
+		for (OrderDetail orderDetail : orderDetails) {
+			Product product = productRepository.findById(orderDetail.getProductId()).orElse(null);
+			orderDetail.setProductName(product.getName());
+		}
+		return orderDetails;
+	}
 
-        namedParameterJdbcTemplate.batchUpdate(sql,parameterSources);
-    }
+	@Override
+	public List<Order> getOrdersByMember(Integer memberId) {
 
-    @Override
-    public Order getOrderById(Integer orderId) {
-        String sql = "select OrderId,MemberId,Price,PayStatus from `Order` where OrderId = :orderId";
+		List<Order> orderList = orderRepository.findByMemberIdOrderByOrderIdDesc(memberId);
 
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("orderId",orderId);
-
-        List<Order> orderList = namedParameterJdbcTemplate.query(sql,map,new OrderRowMapper());
-
-        if (orderList.size() > 0) {
-            return orderList.get(0);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public List<OrderDetail> getOrderDetailsByOrderId(Integer orderId) {
-        String sql = "select od.orderitemsn, od.orderid, od.productid, p.Name, od.quantity, od.standprice, od.itemprice " +
-                "from OrderDetail od " +
-                "left join Product p " +
-                "on od.ProductId = p.Id " +
-                "where OrderId = :orderId ";
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("orderId",orderId);
-
-        List<OrderDetail> orderDetailList = namedParameterJdbcTemplate.query(sql,map,new OrderDetailRowMapper());
-
-        return orderDetailList;
-    }
-
-    @Override
-    public List<Order> getOrdersByMember(Integer memberId) {
-        String sql = "select orderId, memberId, price, payStatus " +
-                "from `Order` where MemberId = :memberId order by OrderId desc";
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("memberId",memberId);
-
-        List<Order> orderList = namedParameterJdbcTemplate.query(sql, map, new OrderRowMapper());
-
-        return orderList;
-    }
+		return orderList;
+	}
 }
