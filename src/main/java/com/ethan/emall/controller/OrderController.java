@@ -1,19 +1,23 @@
 package com.ethan.emall.controller;
 
-import com.ethan.emall.dto.CreateOrderRequest;
-import com.ethan.emall.model.Order;
-import com.ethan.emall.model.OrderDetail;
-import com.ethan.emall.service.OrderService;
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.util.List;
+import com.ethan.emall.dto.CreateOrderRequest;
+import com.ethan.emall.model.Order;
+import com.ethan.emall.service.OrderService;
 
 @RestController
-@CrossOrigin(value = "http://localhost:5173")
 public class OrderController {
 
     @Autowired
