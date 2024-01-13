@@ -22,6 +22,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 		Member member = (Member) session.getAttribute("member");
 
 		if (member != null) {
+			System.out.println("redis-session"+ session.getId());
 			System.out.println("session: "+session);
 			System.out.println("帳號為 "+member.getAccount());
 			System.out.println("已登入");

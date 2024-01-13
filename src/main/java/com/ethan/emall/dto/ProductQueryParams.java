@@ -1,13 +1,18 @@
 package com.ethan.emall.dto;
 
-public class ProductQueryParams {
-    private Integer quantity;
+import java.io.Serializable;
 
-    public Integer getQuantity() {
-        return quantity;
-    }
+public class ProductQueryParams implements Serializable {
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
+	private static final long serialVersionUID = 1L;
+
+	private Integer quantity;
+
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
 }

@@ -41,8 +41,10 @@ public class MemberController {
 	
 	@PostMapping("/members/logout")
 	public void logout(HttpServletRequest request) {
+		System.out.println("準備執行session失效"+request.getSession().getId());
 		HttpSession session = request.getSession();
 		session.invalidate();
+		System.out.println("session失效"+request.getSession().getId());
 	}
 
 }

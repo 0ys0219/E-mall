@@ -63,6 +63,8 @@ public class MemberServiceImpl implements MemberService {
 		if (member.getPassword().equals(hashedPassword)) {
 			//這邊要再思考應該放在controller還是serviceImpl
 			request.getSession().setAttribute("member", member);
+			System.out.println(request.getSession().getId());
+			System.out.println(request.getSession().getAttribute("member"));
 			return member;
 		} else {
 			log.warn("該帳號 {} 的密碼不正確", memberLoginRequest.getAccount());

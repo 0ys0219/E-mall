@@ -1,10 +1,14 @@
 package com.ethan.emall.dto;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 
-public class BuyItem {
+public class BuyItem implements Serializable{
 
-    @NotNull
+    private static final long serialVersionUID = 1L;
+
+	@NotNull
     private Integer productId;
 
     @NotNull

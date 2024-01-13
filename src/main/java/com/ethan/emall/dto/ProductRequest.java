@@ -3,11 +3,15 @@ package com.ethan.emall.dto;
 
 import org.springframework.lang.NonNull;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 
-public class ProductRequest {
+public class ProductRequest implements Serializable{
 
-    @NotNull
+    private static final long serialVersionUID = 1L;
+
+	@NotNull
     private String name;
 
     @NotNull

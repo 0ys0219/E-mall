@@ -1,10 +1,14 @@
 package com.ethan.emall.dto;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotBlank;
 
-public class MemberLoginRequest {
+public class MemberLoginRequest implements Serializable{
 
-    @NotBlank
+    private static final long serialVersionUID = 1L;
+
+	@NotBlank
     private String account;
 
     @NotBlank
